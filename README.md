@@ -1,5 +1,6 @@
 # Repositorio Grupo 7
-## Ingeniería en Sistemas de Información - Cátedra Ingeniería de Software 
+## Ingeniería en Sistemas de Información - Cátedra Ingeniería de Software
+### Universidad Tecnologica Nacional - Facultad Regional Córdoba
 ### Curso: 4k4
 
 ### Docentes:
