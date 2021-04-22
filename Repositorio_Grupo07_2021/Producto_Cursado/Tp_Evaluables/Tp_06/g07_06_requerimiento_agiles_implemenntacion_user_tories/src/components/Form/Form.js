@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
@@ -71,6 +71,8 @@ function StyledRadio(props) {
 
 
 export const MyForm = () => {
+    const [metodoPago, setMetodoPago] = useState("")
+    const [metodoEntrega, setMetodoEntrega] = useState("")
     const ciudadesSel = [
         {
             value: 'Córdoba',
@@ -133,16 +135,44 @@ export const MyForm = () => {
                     </Grid>
                     <Grid item xs={12}>
                         <FormLabel component="legend">Forma de pago</FormLabel>
-                        <RadioGroup defaultValue="female" aria-label="gender" name="customized-radios">
-                            <FormControlLabel className='radio' value="1" control={<StyledRadio />} label="Efectivo" />
-                            <FormControlLabel className='radio' value="2" control={<StyledRadio />} label="Tarjeta" />
+                        <RadioGroup defaultValue={metodoPago} value={metodoPago} aria-label="gender" name="customized-radios" onChange={(e) => setMetodoPago(e.target.value)}>
+                            <FormControlLabel className='radio' value="efectivo" control={<StyledRadio />} label="Efectivo" />
+                            <FormControlLabel className='radio' value="tarjeta" control={<StyledRadio />} label="Tarjeta" />
                         </RadioGroup>
+
+                        {metodoPago === "efectivo" &&
+                            <Grid>
+                                <h1>seleccino efectivo</h1>
+                                {/* aca poner componente efectivo */}
+                            </Grid>}
+
+                        {metodoPago === "tarjeta" &&
+                            <Grid>
+                                <h1>seleccino tarjeta</h1>
+                                {/* aca poner componente tarjeta */}
+
+                            </Grid>
+                        }
                     </Grid>
                     <Grid item xs={12}>
                         <FormLabel component="legend">Desea recibirlo...</FormLabel>
-                        <RadioGroup defaultValue="female" aria-label="gender" name="customized-radios">
-                            <FormControlLabel className='radio' value="3" control={<StyledRadio />} label="Lo antes posible" />
-                            <FormControlLabel className='radio' value="4" control={<StyledRadio />} label="Ingresar fecha y hora" />
+                        <RadioGroup defaultValue={metodoEntrega} value={metodoEntrega} aria-label="gender" name="customized-radios" onChange={(e) => setMetodoEntrega(e.target.value)}>
+                            <FormControlLabel className='radio' value="LoQueSea" control={<StyledRadio />} label="Lo antes posible" />
+                            <FormControlLabel className='radio' value="FechaHora" control={<StyledRadio />} label="Ingresar fecha y hora" />
+                            {metodoEntrega === "LoQueSea" &&
+                                <Grid>
+                                    <h1>seleccino LoQueSea</h1>
+                                    {/* aca poner componente LoQueSea */}
+                                </Grid>}
+
+                            {metodoEntrega === "FechaHora" &&
+                                <Grid>
+                                    <h1>seleccino FechaHora</h1>
+                                    {/* aca poner componente FechaHora */}
+
+                                </Grid>
+
+                            }
                         </RadioGroup>
 
                     </Grid>
