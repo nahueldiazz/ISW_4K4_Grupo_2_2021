@@ -1,0 +1,15 @@
+.inputs{
+    color: rgb(245, 239, 239);
+    & label.Mui-focused {
+        color: 'green',
+      }
+}
+
+
+.ciudades{
+    width: 192px;
+}
+
+.radio{
+    justify-content: center;
+}
