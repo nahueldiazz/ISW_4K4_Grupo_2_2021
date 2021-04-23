@@ -7,6 +7,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
+import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
@@ -73,6 +74,8 @@ function StyledRadio(props) {
 export const MyForm = () => {
     const [metodoPago, setMetodoPago] = useState("")
     const [metodoEntrega, setMetodoEntrega] = useState("")
+    const [ciudades, setCiudades] = useState('');
+    const [nombreImagen, setNombreImagen] = useState('');
     const ciudadesSel = [
         {
             value: 'Córdoba',
@@ -92,7 +95,19 @@ export const MyForm = () => {
         },
     ];
 
-    const [ciudades, setCiudades] = React.useState('');
+    const handleCapture = () => {
+        var fileInput = document.getElementById('file');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(.jpg|.jpeg|.png|.gif)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            alert('No es un tipo de imagen .jpeg/.jpg/.png/.gif .');
+            fileInput.value = '';
+            return false;
+        } else {
+            setNombreImagen(filePath)
+        }
+    }
+
 
     const handleChange = (event) => {
         setCiudades(event.target.value);
@@ -104,9 +119,29 @@ export const MyForm = () => {
                     <Grid item xs={12}>
                         <TextField className='inputs' id="standard-basic" label="Lo que sea" />
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField id="standard-basic" label="imagen" />
+                    <Grid item xs={6}>
+                        <input
+                            accept="image/*"
+                            id="file"
+                            multiple
+                            type="file"
+                            style={{ display: "none" }}
+                            label='algo'
+                            onChange={handleCapture}
+                        />
+                        <Button variant="raised" component="span" >
+                            Cargar imagen
+                              </Button>
+                        <label htmlFor="file">
 
+                            <TextField
+                                id="nameFile"
+                                label="Imagen"
+                                disabled
+                                value={nombreImagen}
+                            ></TextField>
+
+                        </label>
                     </Grid>
                     <Grid item xs={12}>
                         <TextField id="standard-basic" label="Direccion comercio" />
@@ -177,6 +212,7 @@ export const MyForm = () => {
 
                     </Grid>
                 </Grid>
+
             </form >
         </Container>
     );
