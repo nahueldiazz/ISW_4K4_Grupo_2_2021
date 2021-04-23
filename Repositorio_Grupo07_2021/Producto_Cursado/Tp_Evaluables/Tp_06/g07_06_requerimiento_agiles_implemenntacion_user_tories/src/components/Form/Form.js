@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
@@ -72,6 +72,9 @@ function StyledRadio(props) {
 
 
 export const MyForm = () => {
+
+    const submitButton = useRef()
+
     const [metodoPago, setMetodoPago] = useState("")
     const [metodoEntrega, setMetodoEntrega] = useState("")
     const [ciudades, setCiudades] = useState('');
@@ -95,7 +98,13 @@ export const MyForm = () => {
         },
     ];
 
-    const handleCapture = () => {
+
+
+
+    const handleCapture = (e) => {
+
+
+
         var fileInput = document.getElementById('file');
         var filePath = fileInput.value;
         var allowedExtensions = /(.jpg|.jpeg|.png|.gif)$/i;
@@ -104,6 +113,14 @@ export const MyForm = () => {
             fileInput.value = '';
             return false;
         } else {
+            let reader = new FileReader()
+            reader.readAsDataURL(e.target.files[0])
+
+            reader.onload = () => {
+                let preview = document.getElementById("preview")
+                preview.src = reader.result
+            }
+
             setNombreImagen(filePath)
         }
     }
@@ -119,20 +136,22 @@ export const MyForm = () => {
                     <Grid item xs={12}>
                         <TextField className='inputs' id="standard-basic" label="Lo que sea" />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                         <input
+                            ref={submitButton}
                             accept="image/*"
                             id="file"
                             multiple
                             type="file"
-                            style={{ display: "none" }}
+                            style={{ display: 'none' }}
                             label='algo'
                             onChange={handleCapture}
                         />
-                        <Button variant="raised" component="span" >
+                        <Button variant="raised" component="span" onClick={() => submitButton.current.click()} >
                             Cargar imagen
                               </Button>
-                        <label htmlFor="file">
+
+                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
 
                             <TextField
                                 id="nameFile"
@@ -140,9 +159,21 @@ export const MyForm = () => {
                                 disabled
                                 value={nombreImagen}
                             ></TextField>
+                            {nombreImagen && (
 
-                        </label>
+                                <img alt='algo' id="preview" style={{ width: "50px", height: "50px", objectFit: "cover" }} />
+                            )}
+                        </div>
+
                     </Grid>
+
+
+
+                    {nombreImagen &&
+                        <Grid item xs={12}>
+
+                        </Grid>
+                    }
                     <Grid item xs={12}>
                         <TextField id="standard-basic" label="Direccion comercio" />
 
