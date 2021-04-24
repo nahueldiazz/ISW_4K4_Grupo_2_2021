@@ -426,7 +426,7 @@ export const MyForm = () => {
           >
             <Grid item xs={12} lg={11}>
               <div style={{ textAlign: "start" }}>
-                <Heading style={{ margin: "0" }}>Pedí lo que quieras</Heading>
+                <Heading style={{ margin: "0" }}>¡Pedí lo que sea!</Heading>
               </div>
             </Grid>
             <Grid item xs={12} lg={11}>
