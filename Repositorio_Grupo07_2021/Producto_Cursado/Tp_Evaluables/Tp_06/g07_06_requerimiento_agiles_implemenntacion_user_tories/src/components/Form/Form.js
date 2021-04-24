@@ -10,6 +10,14 @@ import {
   InputAdornment,
   AppBar,
   Toolbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Slide,
+  CircularProgress,
+  FormHelperText,
 } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -126,36 +134,58 @@ function StyledRadio(props) {
 
 export const MyForm = () => {
   const submitButton = useRef();
-
   const classes = useStyles();
 
+  // PEDIDO
   const [pedido, setPedido] = useState("");
   const [adjuntos, setAdjuntos] = useState([]);
+  const [errorPedido, setErrorPedido] = useState(true);
   const maxCapacity = 1;
+  // ------
+
+  // COMERCIO
   const [calleComercio, setCalleComercio] = useState("");
   const [numeroComercio, setNumeroComercio] = useState("");
   const [ciudadComercio, setCiudadComercio] = useState("");
   const [referenciaComercio, setReferenciaComercio] = useState("");
+  const [errorComercio, setErrorComercio] = useState(true);
+  // --------
+
+  // ENTREGA
   const [calleEntrega, setCalleEntrega] = useState("");
   const [numeroEntrega, setNumeroEntrega] = useState("");
   const [ciudadEntrega, setCiudadEntrega] = useState("");
   const [referenciaEntrega, setReferenciaEntrega] = useState("");
+  const [metodoEntrega, setMetodoEntrega] = useState("");
+  const [fechaEntrega, setFechaEntrega] = useState(new Date());
+  const [errorEntrega, setErrorEntrega] = useState(true);
+  // -------
+
+  // PAGO
   const [metodoPago, setMetodoPago] = useState("");
   const [nroTarjeta, setNroTarjeta] = useState("");
   const [nombreTitular, setNombreTitular] = useState("");
   const [apellidoTitular, setApellidoTitular] = useState("");
   const [fechaVencimientoTarjeta, setFechaVencimientoTarjeta] = useState("");
   const [cvcTarjeta, setCVCTarjeta] = useState("");
-  const [metodoEntrega, setMetodoEntrega] = useState("");
-  const [ciudades, setCiudades] = useState("");
   const [montoEfectivo, setMontoEfectivo] = useState("");
-  const [fechaEntrega, setFechaEntrega] = useState(new Date());
+  const [errorPago, setErrorPago] = useState(true);
+  // ----
+
+  const [ciudades, setCiudades] = useState("");
+
   const [nombreImagen, setNombreImagen] = useState("");
 
   const [mensajeErrorSnack, setMensajeErrorSnack] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const [activeStep, setActiveStep] = useState(0);
+
+  // DIALOGS
+  const [openDialogConfirmar, setOpenDialogConfirmar] = useState(false);
+  const [openDialogExito, setOpenDialogExito] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  // -------
 
   const ciudadesSel = [
     {
@@ -312,6 +342,11 @@ export const MyForm = () => {
   const onChangePedido = (event) => {
     let value = event.target.value;
     if (value.length <= 300) {
+      if (value.length === 0) {
+        setErrorPedido(true);
+      } else {
+        setErrorPedido(false);
+      }
       setPedido(value);
     }
   };
@@ -443,18 +478,27 @@ export const MyForm = () => {
               </div>
             </Grid>
             <Grid item xs={12} lg={11}>
-              <TextField
-                className="inputs"
-                id="standard-basic"
-                label="Lo que sea"
-                variant="outlined"
-                value={pedido}
-                onChange={onChangePedido}
-                onKeyDown={disableEnterKey}
-                multiline
-                rows="3"
-                fullWidth
-              />
+              <FormControl required fullWidth error={errorPedido}>
+                <TextField
+                  className="inputs"
+                  id="standard-basic"
+                  label="Lo que sea"
+                  variant="outlined"
+                  value={pedido}
+                  onChange={onChangePedido}
+                  onKeyDown={disableEnterKey}
+                  multiline
+                  rows="3"
+                  fullWidth
+                  required
+                  error={errorPedido}
+                />
+                {errorPedido && (
+                  <FormHelperText className={classes.input}>
+                    {`Error`}
+                  </FormHelperText>
+                )}
+              </FormControl>
             </Grid>
             <Grid item xs={12} lg={11} style={{ textAlign: "start" }}>
               <input
@@ -724,7 +768,7 @@ export const MyForm = () => {
                         className="radio"
                         value="FechaHora"
                         control={<StyledRadio />}
-                        label="Otro día..."
+                        label="En otro momento..."
                       />
                     </RadioGroup>
                   </Grid>
@@ -918,6 +962,57 @@ export const MyForm = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
+
+  const handleClose = () => {
+    setOpenDialogConfirmar(false);
+    setOpenDialogExito(false);
+  };
+
+  const onClickFinalizar = () => {
+    setOpenDialogConfirmar(true);
+  };
+
+  const onClickConfirmarPedido = () => {
+    setCargando(true);
+    setTimeout(() => {
+      setCargando(false);
+      setOpenDialogConfirmar(false);
+      setOpenDialogExito(true);
+    }, 2000);
+  };
+
+  const reloadPage = () => {
+    window.location.reload();
+  };
+
+  const errorComercio2 =
+    calleComercio.length === 0 ||
+    numeroComercio.length === 0 ||
+    ciudadComercio.length === 0
+      ? true
+      : false;
+
+  const errorEntrega2 =
+    calleEntrega.length === 0 ||
+    numeroEntrega.length === 0 ||
+    ciudadEntrega.length === 0
+      ? true
+      : false;
+
+  const disableNextStep =
+    activeStep === 0
+      ? errorPedido
+      : activeStep === 1
+      ? errorComercio2
+      : activeStep === 2
+      ? errorEntrega
+      : activeStep === 3
+      ? errorPago
+      : false;
+
   return (
     <>
       <AppBar className={classes.appBar} position="static">
@@ -955,14 +1050,26 @@ export const MyForm = () => {
             position="bottom"
             variant="progress"
             nextButton={
-              <Button
-                size="small"
-                onClick={handleNext}
-                disabled={activeStep === maxSteps - 1}
-              >
-                Next
-                <KeyboardArrowRight />
-              </Button>
+              activeStep === 3 ? (
+                <Button
+                  size="small"
+                  onClick={onClickFinalizar}
+                  //disabled={activeStep === maxSteps - 1}
+                >
+                  Finalizar
+                  <KeyboardArrowRight />
+                </Button>
+              ) : (
+                <Button
+                  size="small"
+                  onClick={handleNext}
+                  //disabled={activeStep === maxSteps - 1}
+                  //disabled={disableNextStep}
+                >
+                  Siguiente
+                  <KeyboardArrowRight />
+                </Button>
+              )
             }
             backButton={
               <Button
@@ -971,12 +1078,52 @@ export const MyForm = () => {
                 disabled={activeStep === 0}
               >
                 <KeyboardArrowLeft />
-                Back
+                Volver
               </Button>
             }
           />
         </Grid>
       </Grid>
+      <Dialog
+        open={openDialogConfirmar}
+        //TransitionComponent={Transition}
+        onClose={handleClose}
+        disableBackdropClick={cargando}
+      >
+        <DialogTitle>{"¿Deseas confirmar tu pedido?"}</DialogTitle>
+        <DialogContent style={{ textAlign: "center" }}>
+          {cargando ? <CircularProgress /> : null}
+          <DialogContentText></DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={cargando} onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button
+            disabled={cargando}
+            onClick={onClickConfirmarPedido}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDialogExito}
+        TransitionComponent={Transition}
+        onClose={handleClose}
+        disableBackdropClick
+      >
+        <DialogTitle>{"¡Tu pedido se hizo correctamente!"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText></DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={cargando} onClick={reloadPage} color="primary">
+            Continuar
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
