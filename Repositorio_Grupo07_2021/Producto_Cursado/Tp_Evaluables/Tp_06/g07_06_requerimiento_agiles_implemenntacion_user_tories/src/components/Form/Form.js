@@ -1,5 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Snackbar, Select, FormControl } from "@material-ui/core";
+import {
+  Snackbar,
+  Select,
+  FormControl,
+  MobileStepper,
+  CardContent,
+  Card,
+  createStyles,
+  InputAdornment,
+} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
@@ -24,57 +33,72 @@ import {
 import DateFnsUtils from "@date-io/date-fns";
 import { es } from "date-fns/esm/locale";
 import moment from "moment";
+import SwipeableViews from "react-swipeable-views";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+
+import { Heading } from "@chakra-ui/react";
 
 moment.locale("es");
 
-const useStyles = makeStyles({
-  root: {
-    "&:hover": {
-      backgroundColor: "transparent",
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    card: {
+      margin: "3em",
+      boxShadow: "0 0 3em rgb(0 0 0 / 15%)",
+      borderRadius: "2em",
+      [theme.breakpoints.down(700)]: {
+        margin: "8vw",
+        boxShadow: "0 0 10vw rgb(0 0 0 / 15%)",
+      },
     },
-    justifyContent: "center",
-  },
-  icon: {
-    borderRadius: "50%",
-    width: 16,
-    height: 16,
-    boxShadow:
-      "inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)",
-    backgroundColor: "#f5f8fa",
-    backgroundImage:
-      "linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))",
-    "$root.Mui-focusVisible &": {
-      outline: "2px auto rgba(19,124,189,.6)",
-      outlineOffset: 2,
+    root: {
+      "&:hover": {
+        backgroundColor: "transparent",
+      },
+      justifyContent: "center",
     },
-    "input:hover ~ &": {
-      backgroundColor: "#ebf1f5",
-    },
-    "input:disabled ~ &": {
-      boxShadow: "none",
-      background: "rgba(206,217,224,.5)",
-    },
-  },
-  checkedIcon: {
-    backgroundColor: "#137cbd",
-    backgroundImage:
-      "linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))",
-    "&:before": {
-      display: "block",
+    icon: {
+      borderRadius: "50%",
       width: 16,
       height: 16,
-      backgroundImage: "radial-gradient(#fff,#fff 28%,transparent 32%)",
-      content: '""',
+      boxShadow:
+        "inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)",
+      backgroundColor: "#f5f8fa",
+      backgroundImage:
+        "linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))",
+      "$root.Mui-focusVisible &": {
+        outline: "2px auto rgba(19,124,189,.6)",
+        outlineOffset: 2,
+      },
+      "input:hover ~ &": {
+        backgroundColor: "#ebf1f5",
+      },
+      "input:disabled ~ &": {
+        boxShadow: "none",
+        background: "rgba(206,217,224,.5)",
+      },
     },
-    "input:hover ~ &": {
-      backgroundColor: "#106ba3",
+    checkedIcon: {
+      backgroundColor: "#137cbd",
+      backgroundImage:
+        "linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))",
+      "&:before": {
+        display: "block",
+        width: 16,
+        height: 16,
+        backgroundImage: "radial-gradient(#fff,#fff 28%,transparent 32%)",
+        content: '""',
+      },
+      "input:hover ~ &": {
+        backgroundColor: "#106ba3",
+      },
     },
-  },
-});
+  })
+);
 
 function StyledRadio(props) {
   const classes = useStyles();
-  console.log(props.value.value);
   return (
     <Radio
       className={classes.root}
@@ -90,9 +114,11 @@ function StyledRadio(props) {
 export const MyForm = () => {
   const submitButton = useRef();
 
+  const classes = useStyles();
+
   const [pedido, setPedido] = useState("");
   const [adjuntos, setAdjuntos] = useState([]);
-  const maxCapacity = 5;
+  const maxCapacity = 1;
   const [calleComercio, setCalleComercio] = useState("");
   const [numeroComercio, setNumeroComercio] = useState("");
   const [ciudadComercio, setCiudadComercio] = useState("");
@@ -115,6 +141,8 @@ export const MyForm = () => {
 
   const [mensajeErrorSnack, setMensajeErrorSnack] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const [activeStep, setActiveStep] = useState(0);
 
   const ciudadesSel = [
     {
@@ -281,8 +309,8 @@ export const MyForm = () => {
     }
   };
   const onChangeNumeroComercio = (event) => {
-    let value = event.target.value;
-    if (value.length <= 300) {
+    let value = getOnlyNumbers(event.target.value);
+    if (value.length <= 4) {
       setNumeroComercio(value);
     }
   };
@@ -305,8 +333,8 @@ export const MyForm = () => {
     }
   };
   const onChangeNumeroEntrega = (event) => {
-    let value = event.target.value;
-    if (value.length <= 300) {
+    let value = getOnlyNumbers(event.target.value);
+    if (value.length <= 4) {
       setNumeroEntrega(value);
     }
   };
@@ -359,6 +387,10 @@ export const MyForm = () => {
     }
   };
 
+  const handleStepChange = (step) => {
+    setActiveStep(step);
+  };
+
   const deleteFile = (archivo) => {
     let archivosActual = Array.from(adjuntos);
 
@@ -375,67 +407,88 @@ export const MyForm = () => {
     setOpenSnackbar(false);
   };
 
-  return (
-    <Container>
-      <form noValidate autoComplete="off">
-        <Grid
-          container
-          direction="row"
-          justify="center"
-          alignItems="center"
-          spacing={1}
-        >
-          <Grid item xs={12} sm={10} md={8} lg={7} xl={7}>
-            <TextField
-              className="inputs"
-              id="standard-basic"
-              label="Lo que sea"
-              value={pedido}
-              onChange={onChangePedido}
-              multiline
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={10} md={8} lg={7} xl={7}>
-            <input
-              ref={submitButton}
-              accept="image/.jpg"
-              id="file"
-              multiple
-              type="file"
-              style={{ display: "none" }}
-              label="algo"
-              onChange={handleFiles}
-            />
-            <Button
-              variant="raised"
-              component="span"
-              onClick={() => submitButton.current.click()}
-            >
-              Cargar imagen
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={10} md={8} lg={7} xl={7}>
-            <Grid
-              container
-              direction="row"
-              justify="center"
-              alignItems="center"
-              spacing={1}
-            >
-              {adjuntos.map((adjunto) => {
-                return (
-                  <Grid item xs={12}>
-                    <div className="file">
-                      <Typography variant="body1">{adjunto.name}</Typography>
-                      <div id="deleteIcon" onClick={() => deleteFile(adjunto)}>
-                        <ClearRoundedIcon id="deleteFile" />
+  const disableEnterKey = (e) => {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+    }
+  };
+
+  const Pedido = () => {
+    return (
+      <Card className={classes.card}>
+        <CardContent>
+          <Grid
+            container
+            direction="row"
+            justify="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid item xs={12} lg={11}>
+              <div style={{ textAlign: "start" }}>
+                <Heading style={{ margin: "0" }}>Pedí lo que quieras</Heading>
+              </div>
+            </Grid>
+            <Grid item xs={12} lg={11}>
+              <TextField
+                className="inputs"
+                id="standard-basic"
+                label="Lo que sea"
+                variant="outlined"
+                value={pedido}
+                onChange={onChangePedido}
+                onKeyDown={disableEnterKey}
+                multiline
+                rows="3"
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} lg={11} style={{ textAlign: "start" }}>
+              <input
+                ref={submitButton}
+                accept="image/.jpg"
+                id="file"
+                multiple
+                type="file"
+                style={{ display: "none", textAlign: "start" }}
+                label="algo"
+                onChange={handleFiles}
+              />
+              <Button
+                variant="outlined"
+                component="span"
+                color="primary"
+                onClick={() => submitButton.current.click()}
+              >
+                Cargar imagen
+              </Button>
+            </Grid>
+            <Grid item xs={12} lg={11} style={{ textAlign: "start" }}>
+              <Grid
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+                spacing={1}
+              >
+                {adjuntos.map((adjunto) => {
+                  return (
+                    <Grid item xs={12} style={{ textAlign: "start" }}>
+                      <div className="file">
+                        <Typography variant="body1" align="left">
+                          {adjunto.name}
+                        </Typography>
+                        <div
+                          id="deleteIcon"
+                          onClick={() => deleteFile(adjunto)}
+                        >
+                          <ClearRoundedIcon id="deleteFile" />
+                        </div>
                       </div>
-                    </div>
-                  </Grid>
-                );
-              })}
-              {/*
+                    </Grid>
+                  );
+                })}
+                {/*
               <TextField
                 id="nameFile"
                 label="Imagen"
@@ -449,235 +502,458 @@ export const MyForm = () => {
                   style={{ width: "50px", height: "50px", objectFit: "cover" }}
                 />
               )}*/}
+              </Grid>
             </Grid>
-          </Grid>
 
-          {nombreImagen && <Grid item xs={12}></Grid>}
-          <Grid item xs={12}>
-            <TextField
-              id="standard-basic"
-              label="Calle"
-              value={calleComercio}
-              onChange={onChangeCalleComercio}
-            />
+            {/*nombreImagen && <Grid item xs={12}></Grid>*/}
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="standard-basic"
-              label="Numero"
-              value={numeroComercio}
-              onChange={onChangeNumeroComercio}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Grid item xs={12}>
-              <TextField
-                id="standard-select-currency"
-                select
-                label="Ciudad"
-                value={ciudadComercio}
-                onChange={onChangeCiudadComercio}
-                helperText="Seleccione una ciudad"
-                className="ciudades"
-              >
-                {ciudadesSel.map((option) => (
-                  <MenuItem
-                    className="ciudades"
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="standard-basic"
-              label="Referencia"
-              value={referenciaComercio}
-              onChange={onChangeReferenciaComercio}
-              multiline
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="standard-basic"
-              label="Calle"
-              value={calleEntrega}
-              onChange={onChangeCalleEntrega}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="standard-basic"
-              label="Numero"
-              value={numeroEntrega}
-              onChange={onChangeNumeroEntrega}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Grid item xs={12}>
-              <TextField
-                id="standard-select-currency"
-                select
-                label="Ciudad"
-                value={ciudadEntrega}
-                onChange={onChangeCiudadEntrega}
-                helperText="Seleccione una ciudad"
-                className="ciudades"
-              >
-                {ciudadesSel.map((option) => (
-                  <MenuItem
-                    className="ciudades"
-                    key={option.value}
-                    value={option.value}
-                  >
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              id="standard-basic"
-              label="Referencia"
-              value={referenciaEntrega}
-              onChange={onChangeReferenciaEntrega}
-              multiline
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormLabel component="legend">Forma de pago</FormLabel>
-            <RadioGroup
-              defaultValue={metodoPago}
-              value={metodoPago}
-              aria-label="gender"
-              name="customized-radios"
-              onChange={(e) => setMetodoPago(e.target.value)}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const Comercio = () => (
+    <Card className={classes.card}>
+      <CardContent>
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={2}
+        >
+          <Grid item xs={12} lg={11}>
+            <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              spacing={2}
             >
-              <FormControlLabel
-                className="radio"
-                value="efectivo"
-                control={<StyledRadio />}
-                label="Efectivo"
-              />
-              <FormControlLabel
-                className="radio"
-                value="tarjeta"
-                control={<StyledRadio />}
-                label="Tarjeta VISA"
-              />
-            </RadioGroup>
+              <Grid item xs={12}>
+                <div style={{ textAlign: "start" }}>
+                  <Heading style={{ margin: "0" }}>¿Dónde lo buscamos?</Heading>
+                </div>
+              </Grid>
+              <Grid item xs={7} sm={8}>
+                <TextField
+                  id="standard-basic"
+                  label="Calle"
+                  variant="outlined"
+                  fullWidth
+                  value={calleComercio}
+                  onChange={onChangeCalleComercio}
+                  onKeyDown={disableEnterKey}
+                />
+              </Grid>
+              <Grid item xs={5} sm={4}>
+                <TextField
+                  id="standard-basic"
+                  label="Numero"
+                  variant="outlined"
+                  fullWidth
+                  value={numeroComercio}
+                  onChange={onChangeNumeroComercio}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  select
+                  label="Ciudad"
+                  variant="outlined"
+                  fullWidth
+                  value={ciudadComercio}
+                  onChange={onChangeCiudadComercio}
+                  onKeyDown={disableEnterKey}
+                  style={{ textAlign: "start" }}
+                  placeholder="Seleccione una ciudad"
+                >
+                  {ciudadesSel.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  id="standard-basic"
+                  label="Referencia"
+                  fullWidth
+                  value={referenciaComercio}
+                  onChange={onChangeReferenciaComercio}
+                  onKeyDown={disableEnterKey}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
 
-            {metodoPago === "efectivo" && (
+  const Entrega = () => (
+    <Card className={classes.card}>
+      <CardContent>
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={1}
+        >
+          <Grid item xs={12} lg={11}>
+            <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              spacing={2}
+            >
+              <Grid item xs={12}>
+                <div style={{ textAlign: "start" }}>
+                  <Heading style={{ margin: "0" }}>
+                    ¿Dónde te lo llevamos?
+                  </Heading>
+                </div>
+              </Grid>
+              <Grid item xs={7} sm={8}>
+                <TextField
+                  id="standard-basic"
+                  label="Calle"
+                  variant="outlined"
+                  value={calleEntrega}
+                  onChange={onChangeCalleEntrega}
+                  fullWidth
+                  onKeyDown={disableEnterKey}
+                />
+              </Grid>
+              <Grid item xs={5} sm={4}>
+                <TextField
+                  id="standard-basic"
+                  label="Numero"
+                  variant="outlined"
+                  value={numeroEntrega}
+                  onChange={onChangeNumeroEntrega}
+                  fullWidth
+                  onKeyDown={disableEnterKey}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Grid item xs={12}>
+                  <TextField
+                    id="standard-select-currency"
+                    select
+                    label="Ciudad"
+                    variant="outlined"
+                    value={ciudadEntrega}
+                    onChange={onChangeCiudadEntrega}
+                    fullWidth
+                    onKeyDown={disableEnterKey}
+                    style={{ textAlign: "start" }}
+                    placeholder="Seleccione una ciudad"
+                  >
+                    {ciudadesSel.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   id="standard-basic"
-                  label="Monto a pagar"
-                  value={montoEfectivo}
-                  onChange={onChangeMontoEfectivo}
+                  label="Referencia"
+                  variant="outlined"
+                  value={referenciaEntrega}
+                  onChange={onChangeReferenciaEntrega}
+                  multiline
+                  fullWidth
+                  rows={3}
+                  onKeyDown={disableEnterKey}
                 />
               </Grid>
-            )}
+              <Grid item xs={12}>
+                <Grid
+                  container
+                  direction="row"
+                  justify="center"
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid item xs={12}>
+                    <div style={{ textAlign: "start" }}>
+                      <Heading style={{ margin: "0" }} as="h4" size="md">
+                        ¿Cuándo quiere recibirlo?
+                      </Heading>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <RadioGroup
+                      defaultValue={metodoEntrega}
+                      value={metodoEntrega}
+                      aria-label="gender"
+                      name="customized-radios"
+                      style={{ alignItems: "start" }}
+                      onChange={(e) => setMetodoEntrega(e.target.value)}
+                    >
+                      <FormControlLabel
+                        className="radio"
+                        value="LoQueSea"
+                        control={<StyledRadio />}
+                        label="¡Lo antes posible!"
+                      />
+                      <FormControlLabel
+                        className="radio"
+                        value="FechaHora"
+                        control={<StyledRadio />}
+                        label="Otro día..."
+                      />
+                    </RadioGroup>
+                  </Grid>
 
-            {metodoPago === "tarjeta" && (
-              <>
-                <Grid item xs={12}>
-                  <TextField
-                    id="standard-basic"
-                    label="Numero de tarjeta"
-                    value={nroTarjeta}
-                    onChange={onChangeNroTarjeta}
-                  />
+                  {metodoEntrega === "FechaHora" && (
+                    <>
+                      <Grid item xs={12}>
+                        <MuiPickersUtilsProvider
+                          libInstance={moment}
+                          utils={DateFnsUtils}
+                          locale={es}
+                        >
+                          <DateTimePicker
+                            autoOk
+                            fullWidth
+                            inputVariant="outlined"
+                            ampm={false}
+                            minDate={new Date()}
+                            value={fechaEntrega}
+                            onChange={setFechaEntrega}
+                            label="Fecha y hora de recepción"
+                            format="dd/MM/yyyy HH:mm"
+                          />
+                        </MuiPickersUtilsProvider>
+                      </Grid>
+                    </>
+                  )}
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    id="standard-basic"
-                    label="Nombre titular"
-                    value={nombreTitular}
-                    onChange={onChangeNombreTitular}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    id="standard-basic"
-                    label="Apellido titular"
-                    value={apellidoTitular}
-                    onChange={onChangeApellidoTitular}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    id="standard-basic"
-                    label="Fecha de vencimiento"
-                    value={fechaVencimientoTarjeta}
-                    onChange={onChangeFechaVencimientoTarjeta}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    id="standard-basic"
-                    label="CVC"
-                    value={cvcTarjeta}
-                    onChange={onChangeCVCTarjeta}
-                  />
-                </Grid>
-              </>
-            )}
-          </Grid>
-          <Grid item xs={12}>
-            <FormLabel component="legend">Desea recibirlo...</FormLabel>
-            <RadioGroup
-              defaultValue={metodoEntrega}
-              value={metodoEntrega}
-              aria-label="gender"
-              name="customized-radios"
-              onChange={(e) => setMetodoEntrega(e.target.value)}
-            >
-              <FormControlLabel
-                className="radio"
-                value="LoQueSea"
-                control={<StyledRadio />}
-                label="Lo antes posible"
-              />
-              <FormControlLabel
-                className="radio"
-                value="FechaHora"
-                control={<StyledRadio />}
-                label="Ingresar fecha y hora"
-              />
-              {metodoEntrega === "LoQueSea" && (
-                <Grid>
-                  <h1>seleccino LoQueSea</h1>
-                  {/* aca poner componente LoQueSea */}
-                </Grid>
-              )}
-
-              {metodoEntrega === "FechaHora" && (
-                <>
-                  <MuiPickersUtilsProvider
-                    libInstance={moment}
-                    utils={DateFnsUtils}
-                    locale={es}
-                  >
-                    <DateTimePicker
-                      autoOk
-                      ampm={false}
-                      minDate={new Date()}
-                      value={fechaEntrega}
-                      onChange={setFechaEntrega}
-                      label="24h clock"
-                    />
-                  </MuiPickersUtilsProvider>
-                </>
-              )}
-            </RadioGroup>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
-      </form>
+      </CardContent>
+    </Card>
+  );
+
+  const Pago = () => (
+    <Card className={classes.card}>
+      <CardContent>
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={1}
+        >
+          <Grid item xs={12} lg={11}>
+            <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              spacing={2}
+            >
+              <Grid item xs={12}>
+                <div style={{ textAlign: "start" }}>
+                  <Heading style={{ margin: "0" }}>¿Cómo deseas pagar?</Heading>
+                </div>
+              </Grid>
+              <Grid item xs={12}>
+                <RadioGroup
+                  defaultValue={metodoPago}
+                  value={metodoPago}
+                  aria-label="gender"
+                  name="customized-radios"
+                  style={{ alignItems: "start" }}
+                  onChange={(e) => setMetodoPago(e.target.value)}
+                >
+                  <Grid
+                    container
+                    direction="row"
+                    justify="center"
+                    alignItems="center"
+                    spacing={2}
+                  >
+                    <Grid item xs={6}>
+                      <FormControlLabel
+                        className="radio"
+                        value="efectivo"
+                        control={<StyledRadio text="Efectivo" />}
+                        label="Efectivo"
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FormControlLabel
+                        className="radio"
+                        value="tarjeta"
+                        control={<StyledRadio text="Tarjeta VISA" />}
+                        label="Tarjeta VISA"
+                      />
+                    </Grid>
+                  </Grid>
+                </RadioGroup>
+              </Grid>
+
+              {metodoPago === "efectivo" && (
+                <Grid item xs={12}>
+                  <TextField
+                    id="standard-basic"
+                    label="Monto a pagar"
+                    variant="outlined"
+                    value={montoEfectivo}
+                    onChange={onChangeMontoEfectivo}
+                    fullWidth
+                    onKeyDown={disableEnterKey}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">$</InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              )}
+
+              {metodoPago === "tarjeta" && (
+                <>
+                  <Grid item xs={7} sm={8}>
+                    <TextField
+                      id="standard-basic"
+                      label="Numero de tarjeta"
+                      variant="outlined"
+                      value={nroTarjeta}
+                      onChange={onChangeNroTarjeta}
+                      fullWidth
+                      onKeyDown={disableEnterKey}
+                    />
+                  </Grid>
+                  <Grid item xs={5} sm={4}>
+                    <TextField
+                      id="standard-basic"
+                      variant="outlined"
+                      label="CVC"
+                      value={cvcTarjeta}
+                      onChange={onChangeCVCTarjeta}
+                      fullWidth
+                      onKeyDown={disableEnterKey}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      id="standard-basic"
+                      label="Nombre titular"
+                      variant="outlined"
+                      value={nombreTitular}
+                      onChange={onChangeNombreTitular}
+                      fullWidth
+                      onKeyDown={disableEnterKey}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      id="standard-basic"
+                      label="Apellido titular"
+                      variant="outlined"
+                      value={apellidoTitular}
+                      onChange={onChangeApellidoTitular}
+                      fullWidth
+                      onKeyDown={disableEnterKey}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      id="standard-basic"
+                      label="Fecha de vencimiento"
+                      placeholder="MM/AA"
+                      variant="outlined"
+                      value={fechaVencimientoTarjeta}
+                      onChange={onChangeFechaVencimientoTarjeta}
+                      fullWidth
+                      onKeyDown={disableEnterKey}
+                    />
+                  </Grid>
+                </>
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+
+  const FormLoQueSea = [Pedido, Comercio, Entrega, Pago];
+
+  const maxSteps = FormLoQueSea.length;
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  return (
+    <>
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        spacing={0}
+      >
+        <Grid item xs={12} sm={10} md={8} lg={6}>
+          <SwipeableViews
+            axis="x"
+            index={activeStep}
+            onChangeIndex={handleStepChange}
+            enableMouseEvents={false}
+          >
+            {FormLoQueSea.map((PasoForm, index) => {
+              return PasoForm();
+            })}
+          </SwipeableViews>
+          <MobileStepper
+            steps={maxSteps}
+            variant="text"
+            activeStep={activeStep}
+            style={{ overflow: "hidden" }}
+            position="bottom"
+            nextButton={
+              <Button
+                size="small"
+                onClick={handleNext}
+                disabled={activeStep === maxSteps - 1}
+              >
+                Next
+                <KeyboardArrowRight />
+              </Button>
+            }
+            backButton={
+              <Button
+                size="small"
+                onClick={handleBack}
+                disabled={activeStep === 0}
+              >
+                <KeyboardArrowLeft />
+                Back
+              </Button>
+            }
+          />
+        </Grid>
+      </Grid>
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
@@ -692,7 +968,7 @@ export const MyForm = () => {
           {mensajeErrorSnack}
         </MuiAlert>
       </Snackbar>
-    </Container>
+    </>
   );
 };
 
