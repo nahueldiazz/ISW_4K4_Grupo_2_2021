@@ -8,6 +8,8 @@ import {
   Card,
   createStyles,
   InputAdornment,
+  AppBar,
+  Toolbar,
 } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -50,6 +52,17 @@ const useStyles = makeStyles((theme) =>
       [theme.breakpoints.down(700)]: {
         margin: "8vw",
         boxShadow: "0 0 10vw rgb(0 0 0 / 15%)",
+      },
+    },
+    appBar: {
+      backgroundColor: "#4299E1",
+      //boxShadow: "0 0 1em rgb(0 0 0 / 15%)",
+    },
+    mobileStepper: {
+      borderTop: "1px solid lightgray",
+      //boxShadow: "0 0 0.5em rgb(0 0 0 / 15%)",
+      [theme.breakpoints.down(700)]: {
+        //boxShadow: "0 0 10vw rgb(0 0 0 / 15%)",
       },
     },
     root: {
@@ -907,6 +920,15 @@ export const MyForm = () => {
 
   return (
     <>
+      <AppBar className={classes.appBar} position="static">
+        <Toolbar>
+          <div style={{ textAlign: "start" }}>
+            <Heading style={{ margin: "0" }} size="3xl" as="h1">
+              DeliverEat!
+            </Heading>
+          </div>
+        </Toolbar>
+      </AppBar>
       <Grid
         container
         direction="row"
@@ -914,7 +936,7 @@ export const MyForm = () => {
         alignItems="center"
         spacing={0}
       >
-        <Grid item xs={12} sm={10} md={8} lg={6}>
+        <Grid item xs={12} sm={10} md={8} lg={7}>
           <SwipeableViews
             axis="x"
             index={activeStep}
@@ -926,11 +948,12 @@ export const MyForm = () => {
             })}
           </SwipeableViews>
           <MobileStepper
+            className={classes.mobileStepper}
             steps={maxSteps}
-            variant="text"
             activeStep={activeStep}
             style={{ overflow: "hidden" }}
             position="bottom"
+            variant="progress"
             nextButton={
               <Button
                 size="small"
