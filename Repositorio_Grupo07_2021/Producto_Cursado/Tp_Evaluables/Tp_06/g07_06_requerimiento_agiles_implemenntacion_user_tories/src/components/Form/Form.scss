@@ -1,15 +1,19 @@
-.inputs{
-    color: rgb(245, 239, 239);
-    & label.Mui-focused {
-        color: 'green',
-      }
+.inputs {
+  color: rgb(245, 239, 239);
+  & label.Mui-focused {
+    color: "green";
+  }
 }
 
-
-.ciudades{
-    width: 192px;
+.ciudades {
+  width: 192px;
 }
 
-.radio{
-    justify-content: center;
+.radio {
+  justify-content: center;
+}
+
+.file {
+  display: flex;
+  justify-content: center;
 }

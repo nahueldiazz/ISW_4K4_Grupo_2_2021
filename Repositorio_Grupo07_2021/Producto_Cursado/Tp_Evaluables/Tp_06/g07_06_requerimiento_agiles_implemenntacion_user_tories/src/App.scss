@@ -1,11 +1,9 @@
-@import './components/Form/Form.scss';
-@import './components/Efectivo/Efectivo.scss';
-@import './components/FechaYHora/FechaHora.scss';
-@import './components/LoQueSea/LoQueSea.scss';
-@import './components/Tarjeta/Tarjeta.scss';
-@import './components/ThankyouPage/Thankyou.scss';
-
-
+@import "./components/Form/Form.scss";
+@import "./components/Efectivo/Efectivo.scss";
+@import "./components/FechaYHora/FechaHora.scss";
+@import "./components/LoQueSea/LoQueSea.scss";
+@import "./components/Tarjeta/Tarjeta.scss";
+@import "./components/ThankyouPage/Thankyou.scss";
 
 .App {
   text-align: center;
@@ -23,7 +21,6 @@
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
