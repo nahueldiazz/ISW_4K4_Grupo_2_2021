@@ -169,7 +169,7 @@ export const MyForm = () => {
   // PEDIDO
   const [pedido, setPedido] = useState("");
   const [adjuntos, setAdjuntos] = useState([]);
-  const [errorPedido, setErrorPedido] = useState(true);
+  const [errorPedido, setErrorPedido] = useState(false);
   const maxCapacity = 1;
   // ------
 
@@ -202,7 +202,10 @@ export const MyForm = () => {
   const [referenciaEntrega, setReferenciaEntrega] = useState("");
   const [metodoEntrega, setMetodoEntrega] = useState("");
   const [fechaEntrega, setFechaEntrega] = useState(new Date());
-  const [errorEntrega, setErrorEntrega] = useState(true);
+  const [errorCalleEntrega, setErrorCalleEntrega] = useState(false);
+  const [errorNumeroEntrega, setErrorNumeroEntrega] = useState(false);
+  const [errorFechaEntrega, setErrorFechaEntrega] = useState(false);
+  const [errorEntrega, setErrorEntrega] = useState(false);
   // -------
 
   // PAGO
@@ -213,8 +216,16 @@ export const MyForm = () => {
   const [fechaVencimientoTarjeta, setFechaVencimientoTarjeta] = useState("");
   const [cvcTarjeta, setCVCTarjeta] = useState("");
   const [montoEfectivo, setMontoEfectivo] = useState("");
-  const [errorPago, setErrorPago] = useState(true);
+  const [errorMontoEfectivo, setErrorMontoEfectivo] = useState(false);
+  const [errorNumeroTarjeta, setErrorNumeroTarjeta] = useState(false);
+  const [errorCVC, setErrorCVC] = useState(false);
+  const [errorFechaTarjeta, setErrorFechaTarjeta] = useState(false);
+  const [errorNombreApellidoTar, setErrorNombreApellidoTar] = useState(false);
+  const [errorPago, setErrorPago] = useState(false);
   // ----
+
+  //Monto a pagar
+  const [montoAPagar, setMontoAPagar] = useState(500);
 
   const [ciudades, setCiudades] = useState("");
 
@@ -293,19 +304,19 @@ export const MyForm = () => {
     }
 
     /*if (!allowedExtensions.exec(filePath)) {
-      alert("No es un tipo de imagen .jpg");
-      //fileInput.value = "";
-      return;
-    } else {
-      let reader = new FileReader();
-      reader.readAsDataURL(e.target.files[0]);
-
-      reader.onload = () => {
-        let preview = document.getElementById("preview");
-        preview.src = reader.result;
-      };
-      setNombreImagen(filePath);
-    }*/
+          alert("No es un tipo de imagen .jpg");
+          //fileInput.value = "";
+          return;
+        } else {
+          let reader = new FileReader();
+          reader.readAsDataURL(e.target.files[0]);
+    
+          reader.onload = () => {
+            let preview = document.getElementById("preview");
+            preview.src = reader.result;
+          };
+          setNombreImagen(filePath);
+        }*/
   };
 
   const handleFiles = (event) => {
@@ -392,6 +403,8 @@ export const MyForm = () => {
         setErrorPedido(false);
       }
       setPedido(value);
+    } else {
+      setErrorPedido(true);
     }
   };
   const onChangeCalleComercio = (event) => {
@@ -421,13 +434,33 @@ export const MyForm = () => {
   const onChangeCalleEntrega = (event) => {
     let value = event.target.value;
     if (value.length <= 300) {
+      if (value.length === 0) {
+        setErrorCalleEntrega(true);
+        setErrorEntrega(true);
+      } else {
+        setErrorCalleEntrega(false);
+        setErrorEntrega(false);
+      }
       setCalleEntrega(value);
+    } else {
+      setErrorCalleEntrega(true);
+      setErrorEntrega(true);
     }
   };
   const onChangeNumeroEntrega = (event) => {
     let value = getOnlyNumbers(event.target.value);
     if (value.length <= 4) {
+      if (value.length === 0) {
+        setErrorNumeroEntrega(true);
+        setErrorEntrega(true);
+      } else {
+        setErrorNumeroEntrega(false);
+        setErrorEntrega(false);
+      }
       setNumeroEntrega(value);
+    } else {
+      setErrorNumeroEntrega(true);
+      setErrorEntrega(true);
     }
   };
   const onChangeCiudadEntrega = (event) => {
@@ -442,39 +475,94 @@ export const MyForm = () => {
       setReferenciaEntrega(value);
     }
   };
+  const onChangeFechayHora = (event) => {
+    let value = event;
+    let now = new Date();
+    console.log(value);
+    if (value <= now) {
+      setErrorFechaEntrega(true);
+      setErrorEntrega(true);
+    } else {
+      setFechaEntrega(value);
+      setErrorFechaEntrega(false);
+      setErrorEntrega(false);
+    }
+  };
+
   const onChangeMontoEfectivo = (event) => {
     let value = getOnlyNumbers(event.target.value);
     if (value.length <= 8) {
+      if (value < montoAPagar) {
+        setErrorMontoEfectivo(true);
+        setErrorPago(true);
+      } else {
+        setErrorMontoEfectivo(false);
+        setErrorPago(false);
+      }
       setMontoEfectivo(value);
+    } else {
+      setErrorMontoEfectivo(true);
+      setErrorPago(true);
     }
   };
   const onChangeNroTarjeta = (event) => {
-    let value = getOnlyNumbers(event.target.value);
+    var visa = /^(?:4[0-9]{12}(?:[0-9]{3})?)$/;
+
+    let value = event.target.value;
+
     if (value.length <= 300) {
+      if (visa.test(value)) {
+        setErrorPago(false);
+        setErrorNumeroTarjeta(false);
+      } else {
+        setErrorNumeroTarjeta(true);
+        setErrorPago(true);
+      }
       setNroTarjeta(value);
     }
   };
   const onChangeNombreTitular = (event) => {
     let value = event.target.value;
     if (value.length <= 300) {
+      if (value.length === 0) {
+        setErrorNombreApellidoTar(true);
+        setErrorPago(true);
+      } else {
+        setErrorNombreApellidoTar(false);
+        setErrorPago(false);
+      }
       setNombreTitular(value);
     }
   };
-  const onChangeApellidoTitular = (event) => {
+
+  const onChangeFechaVencimientoTarjeta = (event) => {
     let value = event.target.value;
     if (value.length <= 300) {
-      setApellidoTitular(value);
-    }
-  };
-  const onChangeFechaVencimientoTarjeta = (event) => {
-    let value = getOnlyNumbers(event.target.value);
-    if (value.length <= 300) {
-      setFechaVencimientoTarjeta(value);
+      if (value.length === 0) {
+        setErrorFechaTarjeta(true);
+        setErrorPago(true);
+      } else {
+        setErrorFechaTarjeta(false);
+        setErrorPago(false);
+      }
+      if (value.length === 2) {
+        setFechaVencimientoTarjeta(value + "/");
+      } else {
+        setFechaVencimientoTarjeta(value);
+      }
     }
   };
   const onChangeCVCTarjeta = (event) => {
     let value = getOnlyNumbers(event.target.value);
     if (value.length <= 3) {
+      if (value.length === 0) {
+        setErrorCVC(true);
+        setErrorPago(true);
+      } else {
+        setErrorCVC(false);
+        setErrorPago(false);
+      }
+
       setCVCTarjeta(value);
     }
   };
@@ -539,7 +627,7 @@ export const MyForm = () => {
                 />
                 {errorPedido && (
                   <FormHelperText className={classes.input}>
-                    {`Error`}
+                    {`El campo es requerido y no puede superar los 300 caracteres`}
                   </FormHelperText>
                 )}
               </FormControl>
@@ -758,7 +846,7 @@ export const MyForm = () => {
     </Card>
   );
 
-  const Entrega = () => (
+  /*const Entrega = () => (
     <Card className={classes.card}>
       <CardContent>
         <Grid
@@ -827,6 +915,97 @@ export const MyForm = () => {
                     ))}
                   </TextField>
                 </Grid>
+            </CardContent>
+        </Card>
+    );*/
+
+  const Entrega = () => (
+    <Card className={classes.card}>
+      <CardContent>
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={1}
+        >
+          <Grid item xs={12} lg={11}>
+            <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              spacing={2}
+            >
+              <Grid item xs={12}>
+                <div style={{ textAlign: "start" }}>
+                  <Heading style={{ margin: "0" }}>
+                    ¿Dónde te lo llevamos?
+                  </Heading>
+                </div>
+              </Grid>
+              <Grid item xs={7} sm={8}>
+                <FormControl fullWidth required error={errorEntrega}>
+                  <TextField
+                    id="standard-basic"
+                    label="Calle"
+                    variant="outlined"
+                    value={calleEntrega}
+                    onChange={onChangeCalleEntrega}
+                    required
+                    fullWidth
+                    onKeyDown={disableEnterKey}
+                  />
+                  {errorCalleEntrega && (
+                    <FormHelperText className={classes.input}>
+                      {`El campo es requerido y no puede superar los 300 caracteres`}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item xs={5} sm={4}>
+                <FormControl fullWidth required error={errorEntrega}>
+                  <TextField
+                    id="standard-basic"
+                    label="Numero"
+                    variant="outlined"
+                    value={numeroEntrega}
+                    onChange={onChangeNumeroEntrega}
+                    fullWidth
+                    required
+                    onKeyDown={disableEnterKey}
+                  />
+                  {errorNumeroEntrega && (
+                    <FormHelperText className={classes.input}>
+                      {`El campo es requerido y no puede superar los 4 caracteres`}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth required error={errorEntrega}>
+                    <TextField
+                      id="standard-select-currency"
+                      select
+                      label="Ciudad"
+                      variant="outlined"
+                      value={ciudadEntrega}
+                      onChange={onChangeCiudadEntrega}
+                      fullWidth
+                      required
+                      onKeyDown={disableEnterKey}
+                      style={{ textAlign: "start" }}
+                      placeholder="Seleccione una ciudad"
+                    >
+                      {ciudadesSel.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </FormControl>
+                </Grid>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -888,17 +1067,25 @@ export const MyForm = () => {
                           utils={DateFnsUtils}
                           locale={es}
                         >
-                          <DateTimePicker
-                            autoOk
-                            fullWidth
-                            inputVariant="outlined"
-                            ampm={false}
-                            minDate={new Date()}
-                            value={fechaEntrega}
-                            onChange={setFechaEntrega}
-                            label="Fecha y hora de recepción"
-                            format="dd/MM/yyyy HH:mm"
-                          />
+                          <FormControl fullWidth required error={errorEntrega}>
+                            <DateTimePicker
+                              autoOk
+                              fullWidth
+                              inputVariant="outlined"
+                              ampm={false}
+                              minDate={new Date()}
+                              value={fechaEntrega}
+                              onChange={onChangeFechayHora}
+                              required
+                              label="Fecha y hora de recepción"
+                              format="dd/MM/yyyy HH:mm"
+                            />
+                            {errorFechaEntrega && (
+                              <FormHelperText className={classes.input}>
+                                {`Se debe ingresar Fecha y Hora futuro`}
+                              </FormHelperText>
+                            )}
+                          </FormControl>
                         </MuiPickersUtilsProvider>
                       </Grid>
                     </>
@@ -933,6 +1120,13 @@ export const MyForm = () => {
               <Grid item xs={12}>
                 <div style={{ textAlign: "start" }}>
                   <Heading style={{ margin: "0" }}>¿Cómo deseas pagar?</Heading>
+                </div>
+              </Grid>
+              <Grid item xs={12}>
+                <div style={{ textAlign: "start" }}>
+                  <Heading style={{ margin: "0" }} as="h4" size="md">
+                    Monto a pagar: $ {montoAPagar}
+                  </Heading>
                 </div>
               </Grid>
               <Grid item xs={12}>
@@ -973,80 +1167,118 @@ export const MyForm = () => {
 
               {metodoPago === "efectivo" && (
                 <Grid item xs={12}>
-                  <TextField
-                    id="standard-basic"
-                    label="Monto a pagar"
-                    variant="outlined"
-                    value={montoEfectivo}
-                    onChange={onChangeMontoEfectivo}
-                    fullWidth
-                    onKeyDown={disableEnterKey}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">$</InputAdornment>
-                      ),
-                    }}
-                  />
+                  <FormControl fullWidth required error={errorMontoEfectivo}>
+                    <TextField
+                      id="standard-basic"
+                      label="Monto a pagar"
+                      variant="outlined"
+                      value={montoEfectivo}
+                      onChange={onChangeMontoEfectivo}
+                      fullWidth
+                      onKeyDown={disableEnterKey}
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">$</InputAdornment>
+                        ),
+                      }}
+                    />
+                    {errorMontoEfectivo && (
+                      <FormHelperText className={classes.input}>
+                        {`El monto no debe ser menor a $500`}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
                 </Grid>
               )}
 
               {metodoPago === "tarjeta" && (
                 <>
                   <Grid item xs={7} sm={8}>
-                    <TextField
-                      id="standard-basic"
-                      label="Numero de tarjeta"
-                      variant="outlined"
-                      value={nroTarjeta}
-                      onChange={onChangeNroTarjeta}
-                      fullWidth
-                      onKeyDown={disableEnterKey}
-                    />
+                    <FormControl fullWidth required error={errorNumeroTarjeta}>
+                      <TextField
+                        id="standard-basic"
+                        label="Numero de tarjeta"
+                        variant="outlined"
+                        value={nroTarjeta}
+                        onChange={onChangeNroTarjeta}
+                        fullWidth
+                        required
+                        onKeyDown={disableEnterKey}
+                        inputProps={{
+                          maxLength: 16,
+                        }}
+                      />
+                      {errorNumeroTarjeta && (
+                        <FormHelperText className={classes.input}>
+                          {`El número no es VISA`}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
                   </Grid>
                   <Grid item xs={5} sm={4}>
-                    <TextField
-                      id="standard-basic"
-                      variant="outlined"
-                      label="CVC"
-                      value={cvcTarjeta}
-                      onChange={onChangeCVCTarjeta}
-                      fullWidth
-                      onKeyDown={disableEnterKey}
-                    />
+                    <FormControl fullWidth required error={errorCVC}>
+                      <TextField
+                        id="standard-basic"
+                        variant="outlined"
+                        label="CVC"
+                        value={cvcTarjeta}
+                        onChange={onChangeCVCTarjeta}
+                        fullWidth
+                        onKeyDown={disableEnterKey}
+                      />
+                      {errorCVC && (
+                        <FormHelperText className={classes.input}>
+                          {`El campo es requerido`}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField
-                      id="standard-basic"
-                      label="Nombre titular"
-                      variant="outlined"
-                      value={nombreTitular}
-                      onChange={onChangeNombreTitular}
+                    <FormControl
                       fullWidth
-                      onKeyDown={disableEnterKey}
-                    />
+                      required
+                      error={errorNombreApellidoTar}
+                    >
+                      <TextField
+                        id="standard-basic"
+                        label="Nombre y apellido titular"
+                        variant="outlined"
+                        value={nombreTitular}
+                        onChange={onChangeNombreTitular}
+                        fullWidth
+                        onKeyDown={disableEnterKey}
+                      />
+                      {errorNombreApellidoTar && (
+                        <FormHelperText className={classes.input}>
+                          {`El campo es requerido`}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
                   </Grid>
+
                   <Grid item xs={12}>
-                    <TextField
-                      id="standard-basic"
-                      label="Apellido titular"
-                      variant="outlined"
-                      value={apellidoTitular}
-                      onChange={onChangeApellidoTitular}
-                      fullWidth
-                      onKeyDown={disableEnterKey}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      id="standard-basic"
-                      label="Fecha de vencimiento"
-                      placeholder="MM/AA"
-                      variant="outlined"
-                      value={fechaVencimientoTarjeta}
-                      onChange={onChangeFechaVencimientoTarjeta}
-                      fullWidth
-                      onKeyDown={disableEnterKey}
-                    />
+                    <FormControl fullWidth required error={errorFechaTarjeta}>
+                      <TextField
+                        id="standard-basic"
+                        label="Fecha de vencimiento"
+                        placeholder="MM/AA"
+                        variant="outlined"
+                        value={fechaVencimientoTarjeta}
+                        onChange={onChangeFechaVencimientoTarjeta}
+                        fullWidth
+                        required
+                        onKeyDown={disableEnterKey}
+                        inputProps={{
+                          maxLength: 5,
+                        }}
+                      />
+                      {errorFechaTarjeta && (
+                        <FormHelperText className={classes.input}>
+                          {`El campo es requerido`}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
                   </Grid>
                 </>
               )}
