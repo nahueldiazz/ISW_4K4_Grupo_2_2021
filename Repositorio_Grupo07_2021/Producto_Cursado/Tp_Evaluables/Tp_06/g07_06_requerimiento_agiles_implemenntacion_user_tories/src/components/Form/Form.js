@@ -19,39 +19,45 @@ import {
   CircularProgress,
   FormHelperText,
   IconButton,
+  TextField,
+  Grid,
+  Container,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  Button,
+  makeStyles,
+  Typography,
+  Grow,
 } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
-import Container from "@material-ui/core/Container";
-import MenuItem from "@material-ui/core/MenuItem";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
-import { Typography } from "@material-ui/core";
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import "./Form.scss";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import MuiAlert from "@material-ui/lab/Alert";
-import { getOnlyNumbers, getOnlyLetters } from "../../utils";
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
   DateTimePicker,
 } from "@material-ui/pickers";
+import clsx from "clsx";
 import DateFnsUtils from "@date-io/date-fns";
 import { es } from "date-fns/esm/locale";
 import moment from "moment";
 import SwipeableViews from "react-swipeable-views";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-
-import { Heading } from "@chakra-ui/react";
-
+import { Heading, SlideFade, ScaleFade } from "@chakra-ui/react";
+import { getOnlyNumbers, getOnlyLetters } from "../../utils";
 import MapsIcon from "../../assets/maps-icon-min.png";
 import GoogleMaps from "../google-maps";
+import "./Form.scss";
+import Lottie from "react-lottie";
+import DoneLottie from "../../assets/lotties/done.json";
+import DeliveryLottie from "../../assets/lotties/delivery.json";
+import LoadingLottie from "../../assets/lotties/loading2.json";
+//import PedidoLogo from "../../assets/pedido-logo.jpg";
+import PedidoLogo from "../../assets/pedido-logo-b.png";
+//import PedidoLogo from "../../assets/pedido-logo-covid.jpg";
 
 moment.locale("es");
 
@@ -60,9 +66,11 @@ const useStyles = makeStyles((theme) =>
     card: {
       margin: "3em",
       boxShadow: "0 0 3em rgb(0 0 0 / 15%)",
-      borderRadius: "2em",
+      borderRadius: "3em",
+      padding: "1em",
       [theme.breakpoints.down(700)]: {
         margin: "8vw",
+        padding: "2vw",
         boxShadow: "0 0 10vw rgb(0 0 0 / 15%)",
       },
     },
@@ -77,6 +85,13 @@ const useStyles = makeStyles((theme) =>
         //boxShadow: "0 0 10vw rgb(0 0 0 / 15%)",
       },
     },
+    mobileStepperProgress: {
+      [theme.breakpoints.down(700)]: {
+        width: "30%",
+      },
+    },
+    dialog: { borderRadius: "1em" },
+    button: { fontWeight: 600, color: "black" },
     dialogMaps: {
       textAlign: "center",
       borderRadius: "2em",
@@ -606,7 +621,9 @@ export const MyForm = () => {
           >
             <Grid item xs={12} lg={11}>
               <div style={{ textAlign: "start" }}>
-                <Heading style={{ margin: "0" }}>¡Pedí lo que sea!</Heading>
+                <Heading style={{ margin: "0" }} as="h6" size="lg">
+                  ¡Pedí lo que sea!
+                </Heading>
               </div>
             </Grid>
             <Grid item xs={12} lg={11}>
@@ -693,7 +710,6 @@ export const MyForm = () => {
               )}*/}
               </Grid>
             </Grid>
-
             {/*nombreImagen && <Grid item xs={12}></Grid>*/}
           </Grid>
         </CardContent>
@@ -735,7 +751,9 @@ export const MyForm = () => {
             >
               <Grid item xs={8} sm={9} md={10}>
                 <div style={{ textAlign: "start" }}>
-                  <Heading style={{ margin: "0" }}>¿Dónde lo buscamos?</Heading>
+                  <Heading style={{ margin: "0" }} as="h6" size="lg">
+                    ¿Dónde lo buscamos?
+                  </Heading>
                 </div>
               </Grid>
               <Grid
@@ -743,7 +761,11 @@ export const MyForm = () => {
                 xs={4}
                 sm={3}
                 md={2}
-                style={{ textAlign: "-webkit-right" }}
+                style={{
+                  textAlign: navigator.userAgent.includes("Chrome")
+                    ? "-webkit-right"
+                    : "-moz-right",
+                }}
               >
                 <div
                   className={classes.buttonMaps}
@@ -939,7 +961,7 @@ export const MyForm = () => {
             >
               <Grid item xs={12}>
                 <div style={{ textAlign: "start" }}>
-                  <Heading style={{ margin: "0" }}>
+                  <Heading style={{ margin: "0" }} as="h6" size="lg">
                     ¿Dónde te lo llevamos?
                   </Heading>
                 </div>
@@ -1119,7 +1141,9 @@ export const MyForm = () => {
             >
               <Grid item xs={12}>
                 <div style={{ textAlign: "start" }}>
-                  <Heading style={{ margin: "0" }}>¿Cómo deseas pagar?</Heading>
+                  <Heading style={{ margin: "0" }} as="h6" size="lg">
+                    ¿Cómo deseas pagar?
+                  </Heading>
                 </div>
               </Grid>
               <Grid item xs={12}>
@@ -1320,7 +1344,7 @@ export const MyForm = () => {
       setCargando(false);
       setOpenDialogConfirmar(false);
       setOpenDialogExito(true);
-    }, 2000);
+    }, 2700);
   };
 
   const reloadPage = () => {
@@ -1352,12 +1376,37 @@ export const MyForm = () => {
       ? errorPago
       : false;
 
+  const defaultOptionsDone = {
+    loop: false,
+    autoplay: true,
+    animationData: DoneLottie,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+  const defaultOptionsDelivery = {
+    loop: true,
+    autoplay: true,
+    animationData: DeliveryLottie,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+  const defaultOptionsLoading = {
+    loop: true,
+    autoplay: true,
+    animationData: LoadingLottie,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
     <>
       <AppBar className={classes.appBar} position="static">
         <Toolbar>
-          <div style={{ textAlign: "start" }}>
-            <Heading style={{ margin: "0" }} size="3xl" as="h1">
+          <div style={{ textAlign: "start", margin: "1em" }}>
+            <Heading style={{ margin: "0" }} size="xl" as="h1">
               DeliverEat!
             </Heading>
           </div>
@@ -1370,7 +1419,7 @@ export const MyForm = () => {
         alignItems="center"
         spacing={0}
       >
-        <Grid item xs={12} sm={10} md={8} lg={7}>
+        <Grid item xs={12} sm={12} md={10} lg={10} xl={8}>
           <SwipeableViews
             axis="x"
             index={activeStep}
@@ -1379,10 +1428,15 @@ export const MyForm = () => {
           >
             {FormLoQueSea.map((PasoForm, index) => {
               return PasoForm();
+
+              /*Grow in={true} timeout={700}>
+                  {PasoForm()}
+                </Grow>*/
             })}
           </SwipeableViews>
           <MobileStepper
             className={classes.mobileStepper}
+            classes={{ progress: classes.mobileStepperProgress }}
             steps={maxSteps}
             activeStep={activeStep}
             style={{ overflow: "hidden" }}
@@ -1393,6 +1447,7 @@ export const MyForm = () => {
                 <Button
                   size="small"
                   onClick={onClickFinalizar}
+                  classes={{ root: classes.button }}
                   //disabled={activeStep === maxSteps - 1}
                 >
                   Finalizar
@@ -1402,6 +1457,7 @@ export const MyForm = () => {
                 <Button
                   size="small"
                   onClick={handleNext}
+                  classes={{ root: classes.button }}
                   //disabled={activeStep === maxSteps - 1}
                   //disabled={disableNextStep}
                 >
@@ -1428,20 +1484,46 @@ export const MyForm = () => {
         //TransitionComponent={Transition}
         onClose={handleClose}
         disableBackdropClick={cargando}
+        classes={{ paper: classes.dialog }}
       >
-        <DialogTitle>{"¿Deseas confirmar tu pedido?"}</DialogTitle>
+        <DialogTitle>
+          <div style={{ textAlign: "start" }}>
+            <Heading style={{ margin: "0" }} as="h6" size="md">
+              {cargando ? "" : "¿Deseas confirmar tu pedido?"}
+            </Heading>
+          </div>
+        </DialogTitle>
         <DialogContent style={{ textAlign: "center" }}>
-          {cargando ? <CircularProgress /> : null}
-          <DialogContentText></DialogContentText>
+          <DialogContentText>
+            {cargando ? (
+              <Lottie
+                options={defaultOptionsLoading}
+                height={150}
+                width={150}
+              />
+            ) : (
+              <Lottie
+                options={defaultOptionsDelivery}
+                height={150}
+                width={150}
+              />
+            )}
+          </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button disabled={cargando} onClick={handleClose} color="primary">
+        <DialogActions style={{ alignSelf: "center" }}>
+          <Button
+            disabled={cargando}
+            onClick={handleClose}
+            color="primary"
+            classes={{ root: classes.button }}
+          >
             Cancelar
           </Button>
           <Button
             disabled={cargando}
             onClick={onClickConfirmarPedido}
             color="primary"
+            classes={{ root: classes.button }}
           >
             Confirmar
           </Button>
@@ -1452,13 +1534,27 @@ export const MyForm = () => {
         TransitionComponent={Transition}
         onClose={handleClose}
         disableBackdropClick
+        classes={{ paper: classes.dialog }}
       >
-        <DialogTitle>{"¡Tu pedido se hizo correctamente!"}</DialogTitle>
+        <DialogTitle>
+          <div style={{ textAlign: "start" }}>
+            <Heading style={{ margin: "0" }} as="h6" size="md">
+              ¡Tu pedido se hizo correctamente!
+            </Heading>
+          </div>
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText></DialogContentText>
+          <DialogContentText>
+            <Lottie options={defaultOptionsDone} height={150} width={150} />
+          </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button disabled={cargando} onClick={reloadPage} color="primary">
+        <DialogActions style={{ alignSelf: "center" }}>
+          <Button
+            disabled={cargando}
+            onClick={reloadPage}
+            color="primary"
+            classes={{ root: classes.button }}
+          >
             Continuar
           </Button>
         </DialogActions>
