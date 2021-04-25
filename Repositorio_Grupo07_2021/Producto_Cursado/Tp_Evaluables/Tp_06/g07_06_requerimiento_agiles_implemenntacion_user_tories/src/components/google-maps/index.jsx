@@ -72,7 +72,6 @@ export function MapContainer(props) {
     await getDirections(place.lat, place.lng)
       .then((res) => {
         let data = { direccion: res };
-        console.log(data);
         setDataPlace(data);
         props.setDatosDomicilioMaps(data.direccion);
       })

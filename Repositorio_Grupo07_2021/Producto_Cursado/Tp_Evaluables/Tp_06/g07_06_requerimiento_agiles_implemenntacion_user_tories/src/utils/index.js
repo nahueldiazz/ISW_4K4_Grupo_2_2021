@@ -21,6 +21,12 @@ export const getOnlyNumbers = (string) => {
     .replace(/[^0-9 ]/g, "")
     .replace(/ /g, "");
 };
+export const getOnlyNumbers2 = (string) => {
+  return string
+    .normalize("NFD")
+    .replace(/[^0-9/ ]/g, "")
+    .replace(/ /g, "");
+};
 
 export const deleteSpaces = (text) => {
   return text.replace(/\s/g, "");
