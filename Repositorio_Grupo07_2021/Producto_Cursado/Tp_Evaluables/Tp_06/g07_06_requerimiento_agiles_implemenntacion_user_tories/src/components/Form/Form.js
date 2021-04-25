@@ -18,6 +18,7 @@ import {
   Slide,
   CircularProgress,
   FormHelperText,
+  IconButton,
 } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -34,7 +35,7 @@ import { Typography } from "@material-ui/core";
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 import "./Form.scss";
 import MuiAlert from "@material-ui/lab/Alert";
-import { getOnlyNumbers } from "../../utils";
+import { getOnlyNumbers, getOnlyLetters } from "../../utils";
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
@@ -48,6 +49,9 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
 import { Heading } from "@chakra-ui/react";
+
+import MapsIcon from "../../assets/maps-icon-min.png";
+import GoogleMaps from "../google-maps";
 
 moment.locale("es");
 
@@ -72,6 +76,32 @@ const useStyles = makeStyles((theme) =>
       [theme.breakpoints.down(700)]: {
         //boxShadow: "0 0 10vw rgb(0 0 0 / 15%)",
       },
+    },
+    dialogMaps: {
+      textAlign: "center",
+      borderRadius: "2em",
+      padding: "2em",
+      height: "70%",
+      width: "100%",
+      [theme.breakpoints.between(0, 700)]: {
+        width: "80vw",
+        margin: "0 0 0 0",
+        padding: "1vw",
+        minHeight: "90%",
+        borderRadius: "4vw",
+      },
+    },
+    buttonMaps: {
+      border: "1px solid lightgray",
+      backgroundColor: "white",
+      cursor: "pointer",
+      borderRadius: "50%",
+      height: "3em",
+      width: "3em",
+      justifyContent: "center",
+      backgroundSize: "2em 2em",
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "center",
     },
     root: {
       "&:hover": {
@@ -148,7 +178,21 @@ export const MyForm = () => {
   const [numeroComercio, setNumeroComercio] = useState("");
   const [ciudadComercio, setCiudadComercio] = useState("");
   const [referenciaComercio, setReferenciaComercio] = useState("");
+  const [datosDomicilioMaps, setDatosDomicilioMaps] = useState("");
   const [errorComercio, setErrorComercio] = useState(true);
+  const [openDialogMaps, setOpenDialogMaps] = useState(false);
+  const [ubicacionPorMaps, setUbicacionPorMaps] = useState(false);
+
+  useEffect(() => {
+    if (datosDomicilioMaps.length) {
+      console.log(datosDomicilioMaps);
+      setUbicacionPorMaps(true);
+      let direccion = datosDomicilioMaps.split(",")[0];
+      console.log(direccion);
+      //console.log(getOnlyLetters(direccion));
+      //console.log(getOnlyNumbers(direccion));
+    }
+  }, [datosDomicilioMaps]);
   // --------
 
   // ENTREGA
@@ -569,6 +613,20 @@ export const MyForm = () => {
     );
   };
 
+  const onClickMaps = () => {
+    setOpenDialogMaps(true);
+  };
+
+  const handleCloseMaps = () => {
+    setDatosDomicilioMaps("");
+    setUbicacionPorMaps(false);
+    setOpenDialogMaps(false);
+  };
+  const handleContinuarMaps = () => {
+    setUbicacionPorMaps(true);
+    setOpenDialogMaps(false);
+  };
+
   const Comercio = () => (
     <Card className={classes.card}>
       <CardContent>
@@ -587,51 +645,99 @@ export const MyForm = () => {
               alignItems="center"
               spacing={2}
             >
-              <Grid item xs={12}>
+              <Grid item xs={8} sm={9} md={10}>
                 <div style={{ textAlign: "start" }}>
                   <Heading style={{ margin: "0" }}>¿Dónde lo buscamos?</Heading>
                 </div>
               </Grid>
-              <Grid item xs={7} sm={8}>
-                <TextField
-                  id="standard-basic"
-                  label="Calle"
-                  variant="outlined"
-                  fullWidth
-                  value={calleComercio}
-                  onChange={onChangeCalleComercio}
-                  onKeyDown={disableEnterKey}
-                />
+              <Grid
+                item
+                xs={4}
+                sm={3}
+                md={2}
+                style={{ textAlign: "-webkit-right" }}
+              >
+                <div
+                  className={classes.buttonMaps}
+                  onClick={onClickMaps}
+                  style={{ backgroundImage: `url(${MapsIcon})` }}
+                ></div>
               </Grid>
-              <Grid item xs={5} sm={4}>
-                <TextField
-                  id="standard-basic"
-                  label="Numero"
-                  variant="outlined"
-                  fullWidth
-                  value={numeroComercio}
-                  onChange={onChangeNumeroComercio}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  select
-                  label="Ciudad"
-                  variant="outlined"
-                  fullWidth
-                  value={ciudadComercio}
-                  onChange={onChangeCiudadComercio}
-                  onKeyDown={disableEnterKey}
-                  style={{ textAlign: "start" }}
-                  placeholder="Seleccione una ciudad"
-                >
-                  {ciudadesSel.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+              {ubicacionPorMaps ? (
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      id="standard-basic"
+                      label="Dirección"
+                      fullWidth
+                      disabled
+                      value={datosDomicilioMaps}
+                      onChange={onChangeReferenciaComercio}
+                      onKeyDown={disableEnterKey}
+                      multiline
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton
+                            onClick={() => {
+                              setUbicacionPorMaps(false);
+                            }}
+                            style={{ height: "fit-content", padding: 0 }}
+                          >
+                            <InputAdornment position="start">
+                              <ClearRoundedIcon />
+                            </InputAdornment>
+                          </IconButton>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </>
+              ) : (
+                <>
+                  <Grid item xs={7} sm={8}>
+                    <TextField
+                      id="standard-basic"
+                      label="Calle"
+                      variant="outlined"
+                      fullWidth
+                      value={calleComercio}
+                      onChange={onChangeCalleComercio}
+                      onKeyDown={disableEnterKey}
+                    />
+                  </Grid>
+                  <Grid item xs={5} sm={4}>
+                    <TextField
+                      id="standard-basic"
+                      label="Numero"
+                      variant="outlined"
+                      fullWidth
+                      value={numeroComercio}
+                      onChange={onChangeNumeroComercio}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="Ciudad"
+                      variant="outlined"
+                      fullWidth
+                      value={ciudadComercio}
+                      onChange={onChangeCiudadComercio}
+                      onKeyDown={disableEnterKey}
+                      style={{ textAlign: "start" }}
+                      placeholder="Seleccione una ciudad"
+                    >
+                      {ciudadesSel.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                </>
+              )}
               <Grid item xs={12}>
                 <TextField
                   variant="outlined"
@@ -699,6 +805,7 @@ export const MyForm = () => {
                   onKeyDown={disableEnterKey}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <Grid item xs={12}>
                   <TextField
@@ -1120,6 +1227,34 @@ export const MyForm = () => {
         </DialogContent>
         <DialogActions>
           <Button disabled={cargando} onClick={reloadPage} color="primary">
+            Continuar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDialogMaps}
+        //TransitionComponent={Transition}
+        onClose={handleCloseMaps}
+        disableBackdropClick
+        classes={{ paper: classes.dialogMaps }}
+      >
+        <DialogContent>
+          <GoogleMaps
+            //datosDomicilioMaps={datosDomicilioMaps}
+            setDatosDomicilioMaps={setDatosDomicilioMaps}
+            isDialogOpen={true}
+          />
+        </DialogContent>
+        <DialogActions style={{ justifyContent: "center" }}>
+          <Button onClick={handleCloseMaps} color="primary" variant="contained">
+            Volver
+          </Button>
+          <Button
+            disabled={datosDomicilioMaps.length === 0}
+            onClick={handleContinuarMaps}
+            color="primary"
+            variant="contained"
+          >
             Continuar
           </Button>
         </DialogActions>
