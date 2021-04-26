@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) =>
     card: {
       margin: "3em",
       boxShadow: "0 0 3em rgb(0 0 0 / 15%)",
-      borderRadius: "3em",
+      borderRadius: "2em",
       padding: "1em",
       [theme.breakpoints.down(700)]: {
         margin: "8vw",
@@ -655,7 +655,6 @@ export const MyForm = () => {
       return;
     }
     const year = parseInt(date.substring(3, 7));
-    console.log(year);
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
