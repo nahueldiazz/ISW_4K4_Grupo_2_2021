@@ -61,6 +61,11 @@ import PedidoLogo from "../../assets/pedido-logo-b.png";
 
 moment.locale("es");
 
+Date.prototype.addHours = function (h) {
+  this.setTime(this.getTime() + h * 60 * 60 * 1000);
+  return this;
+};
+
 const useStyles = makeStyles((theme) =>
   createStyles({
     card: {
@@ -195,6 +200,7 @@ export const MyForm = () => {
   const [ciudadComercio, setCiudadComercio] = useState("");
   const [referenciaComercio, setReferenciaComercio] = useState("");
   const [datosDomicilioMaps, setDatosDomicilioMaps] = useState("");
+
   const [errorComercio, setErrorComercio] = useState(true);
   const [openDialogMaps, setOpenDialogMaps] = useState(false);
   const [ubicacionPorMaps, setUbicacionPorMaps] = useState(false);
@@ -215,11 +221,21 @@ export const MyForm = () => {
   const [ciudadEntrega, setCiudadEntrega] = useState("");
   const [referenciaEntrega, setReferenciaEntrega] = useState("");
   const [metodoEntrega, setMetodoEntrega] = useState("");
-  const [fechaEntrega, setFechaEntrega] = useState(new Date());
+  const [fechaEntrega, setFechaEntrega] = useState(new Date().addHours(1));
   const [errorCalleEntrega, setErrorCalleEntrega] = useState(false);
   const [errorNumeroEntrega, setErrorNumeroEntrega] = useState(false);
   const [errorFechaEntrega, setErrorFechaEntrega] = useState(false);
   const [errorEntrega, setErrorEntrega] = useState(true);
+  const [openDialogMapsEntrega, setOpenDialogMapsEntrega] = useState(false);
+  const [ubicacionEntregaPorMaps, setUbicacionEntregaPorMaps] = useState(false);
+  const [datosDomicilioEntregaMaps, setDatosDomicilioEntregaMaps] = useState(
+    ""
+  );
+  useEffect(() => {
+    if (datosDomicilioEntregaMaps.length) {
+      setUbicacionEntregaPorMaps(true);
+    }
+  }, [datosDomicilioEntregaMaps]);
   // -------
 
   // PAGO
@@ -857,15 +873,30 @@ export const MyForm = () => {
   const onClickMaps = () => {
     setOpenDialogMaps(true);
   };
+  const onClickMapsEntrega = () => {
+    setOpenDialogMapsEntrega(true);
+  };
 
   const handleCloseMaps = () => {
     setDatosDomicilioMaps("");
     setUbicacionPorMaps(false);
     setOpenDialogMaps(false);
   };
+
+  const handleCloseMapsEntrega = () => {
+    setDatosDomicilioEntregaMaps("");
+    setUbicacionEntregaPorMaps(false);
+    setOpenDialogMapsEntrega(false);
+  };
+
   const handleContinuarMaps = () => {
     setUbicacionPorMaps(true);
     setOpenDialogMaps(false);
+  };
+
+  const handleContinuarMapsEntrega = () => {
+    setUbicacionEntregaPorMaps(true);
+    setOpenDialogMapsEntrega(false);
   };
 
   const Comercio = () => (
@@ -1042,78 +1073,129 @@ export const MyForm = () => {
               alignItems="flex-start"
               spacing={2}
             >
-              <Grid item xs={12}>
+              <Grid item xs={8} sm={9} md={10}>
                 <div style={{ textAlign: "start" }}>
                   <Heading style={{ margin: "0" }} as="h6" size="lg">
                     ¿Dónde te lo llevamos?
                   </Heading>
                 </div>
               </Grid>
-              <Grid item xs={7} sm={8}>
-                <FormControl required fullWidth error={errorCalleEntrega}>
-                  <TextField
-                    id="standard-basic"
-                    label="Calle"
-                    variant="outlined"
-                    value={calleEntrega}
-                    onChange={onChangeCalleEntrega}
-                    required
-                    fullWidth
-                    onKeyDown={disableEnterKey}
-                    error={errorCalleEntrega}
-                  />
-                  {errorCalleEntrega && (
-                    <FormHelperText className={classes.input}>
-                      {`El campo es requerido y no puede superar los 300 caracteres`}
-                    </FormHelperText>
-                  )}
-                </FormControl>
+              <Grid
+                item
+                xs={4}
+                sm={3}
+                md={2}
+                style={{
+                  textAlign: navigator.userAgent.includes("Chrome")
+                    ? "-webkit-right"
+                    : "-moz-right",
+                }}
+              >
+                <div
+                  className={classes.buttonMaps}
+                  onClick={onClickMapsEntrega}
+                  style={{ backgroundImage: `url(${MapsIcon})` }}
+                ></div>
               </Grid>
-              <Grid item xs={5} sm={4}>
-                <FormControl fullWidth required error={errorNumeroEntrega}>
-                  <TextField
-                    id="standard-basic"
-                    label="Numero"
-                    variant="outlined"
-                    value={numeroEntrega}
-                    onChange={onChangeNumeroEntrega}
-                    fullWidth
-                    required
-                    onKeyDown={disableEnterKey}
-                    error={errorNumeroEntrega}
-                  />
-                  {errorNumeroEntrega && (
-                    <FormHelperText className={classes.input}>
-                      {`El campo es requerido y no puede superar los 5 caracteres`}
-                    </FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid item xs={12}>
-                  <FormControl fullWidth required error={errorEntrega}>
+              {ubicacionEntregaPorMaps ? (
+                <>
+                  <Grid item xs={12}>
                     <TextField
-                      id="standard-select-currency"
-                      select
-                      label="Ciudad"
                       variant="outlined"
-                      value={ciudadEntrega}
-                      onChange={onChangeCiudadEntrega}
+                      id="standard-basic"
+                      label="Dirección"
                       fullWidth
-                      required
+                      disabled
+                      value={datosDomicilioEntregaMaps}
+                      onChange={onChangeReferenciaComercio}
                       onKeyDown={disableEnterKey}
-                      style={{ textAlign: "start" }}
-                      placeholder="Seleccione una ciudad"
-                    >
-                      {ciudadesSel.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </FormControl>
-                </Grid>
-              </Grid>
+                      multiline
+                      InputProps={{
+                        endAdornment: (
+                          <IconButton
+                            onClick={() => {
+                              setUbicacionEntregaPorMaps(false);
+                            }}
+                            style={{ height: "fit-content", padding: 0 }}
+                          >
+                            <InputAdornment position="start">
+                              <ClearRoundedIcon />
+                            </InputAdornment>
+                          </IconButton>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </>
+              ) : (
+                <>
+                  <Grid item xs={7} sm={8}>
+                    <FormControl required fullWidth error={errorCalleEntrega}>
+                      <TextField
+                        id="standard-basic"
+                        label="Calle"
+                        variant="outlined"
+                        value={calleEntrega}
+                        onChange={onChangeCalleEntrega}
+                        required
+                        fullWidth
+                        onKeyDown={disableEnterKey}
+                        error={errorCalleEntrega}
+                      />
+                      {errorCalleEntrega && (
+                        <FormHelperText className={classes.input}>
+                          {`El campo es requerido y no puede superar los 300 caracteres`}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={5} sm={4}>
+                    <FormControl fullWidth required error={errorNumeroEntrega}>
+                      <TextField
+                        id="standard-basic"
+                        label="Numero"
+                        variant="outlined"
+                        value={numeroEntrega}
+                        onChange={onChangeNumeroEntrega}
+                        fullWidth
+                        required
+                        onKeyDown={disableEnterKey}
+                        error={errorNumeroEntrega}
+                      />
+                      {errorNumeroEntrega && (
+                        <FormHelperText className={classes.input}>
+                          {`El campo es requerido y no puede superar los 5 caracteres`}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth required error={errorEntrega}>
+                        <TextField
+                          id="standard-select-currency"
+                          select
+                          label="Ciudad"
+                          variant="outlined"
+                          value={ciudadEntrega}
+                          onChange={onChangeCiudadEntrega}
+                          fullWidth
+                          required
+                          onKeyDown={disableEnterKey}
+                          style={{ textAlign: "start" }}
+                          placeholder="Seleccione una ciudad"
+                        >
+                          {ciudadesSel.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </>
+              )}
               <Grid item xs={12}>
                 <TextField
                   id="standard-basic"
@@ -1487,16 +1569,21 @@ export const MyForm = () => {
       ? true
       : false;*/
 
-  const errorEntrega2 =
-    calleEntrega.length === 0 ||
-    errorCalleEntrega ||
-    numeroEntrega.length === 0 ||
-    errorNumeroEntrega ||
-    ciudadEntrega.length === 0 ||
-    metodoEntrega.length === 0 ||
-    (metodoEntrega === "FechaHora" && errorFechaEntrega)
+  const errorEntrega2 = ubicacionEntregaPorMaps
+    ? datosDomicilioEntregaMaps.length === 0 ||
+      metodoEntrega.length === 0 ||
+      (metodoEntrega === "FechaHora" && errorFechaEntrega)
       ? true
-      : false;
+      : false
+    : calleEntrega.length === 0 ||
+      errorCalleEntrega ||
+      numeroEntrega.length === 0 ||
+      errorNumeroEntrega ||
+      ciudadEntrega.length === 0 ||
+      metodoEntrega.length === 0 ||
+      (metodoEntrega === "FechaHora" && errorFechaEntrega)
+    ? true
+    : false;
 
   /*const errorPago2 =
     metodoPago === "efectivo" && montoEfectivo.length === 0
@@ -1752,6 +1839,38 @@ export const MyForm = () => {
           <Button
             disabled={datosDomicilioMaps.length === 0}
             onClick={handleContinuarMaps}
+            color="primary"
+            variant="contained"
+          >
+            Continuar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openDialogMapsEntrega}
+        //TransitionComponent={Transition}
+        onClose={handleCloseMapsEntrega}
+        disableBackdropClick
+        classes={{ paper: classes.dialogMaps }}
+      >
+        <DialogContent>
+          <GoogleMaps
+            //datosDomicilioMaps={datosDomicilioMaps}
+            setDatosDomicilioMaps={setDatosDomicilioEntregaMaps}
+            isDialogOpen={true}
+          />
+        </DialogContent>
+        <DialogActions style={{ justifyContent: "center" }}>
+          <Button
+            onClick={handleCloseMapsEntrega}
+            color="primary"
+            variant="contained"
+          >
+            Volver
+          </Button>
+          <Button
+            disabled={datosDomicilioEntregaMaps.length === 0}
+            onClick={handleContinuarMapsEntrega}
             color="primary"
             variant="contained"
           >
