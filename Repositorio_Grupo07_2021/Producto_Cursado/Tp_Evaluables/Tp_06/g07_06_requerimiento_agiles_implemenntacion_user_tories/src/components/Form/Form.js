@@ -310,12 +310,12 @@ export const MyForm = () => {
         if (allowedExtensions.exec(archivo.name)) {
           archivos.push(archivo);
         } else {
-          alert("Pueden ser 5 archivos como máximo");
+          alert("Puede ser 1 archivo como máximo");
           return;
         }
       });
     } else {
-      alert("Pueden ser 5 archivos como máximo");
+      alert("Puede ser 1 archivo como máximo");
       return;
     }
     setAdjuntos(archivos);
@@ -324,7 +324,7 @@ export const MyForm = () => {
       if (archivos.length <= 5) {
         setAdjuntos(archivos);
       } else {
-        alert("Pueden ser 5 archivos como máximo");
+        alert("Pueden ser 1 archivo como máximo");
         return;
       }
     } else {
@@ -418,7 +418,7 @@ export const MyForm = () => {
         }
       } else {
         setOpenSnackbar(true);
-        setMensajeErrorSnack("Puede subir hasta un máximo de 5 archivos");
+        setMensajeErrorSnack("Puede subir hasta un máximo de 1 archivo");
         //alert("Puede subir hasta un máximo de 5 archivos");
       }
     } else {
