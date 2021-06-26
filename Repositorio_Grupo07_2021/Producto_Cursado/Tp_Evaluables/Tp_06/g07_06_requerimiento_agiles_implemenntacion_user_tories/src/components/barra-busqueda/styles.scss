@@ -1,0 +1,17 @@
+@import "../../styles/variables";
+
+#searchBox {
+  border-radius: 2em;
+  padding: 10px 50px 10px 50px;
+  /*border: 1px solid lightgray;*/
+  background-color: white;
+  box-shadow: $box-shadow-faded;
+}
+
+@media only screen and (max-width: 700px) {
+  #searchBox {
+    border-radius: 10vw;
+    padding: 2vw 8vw;
+    box-shadow: 0 0 5vw rgba(0, 0, 0, 0.1);
+  }
+}
