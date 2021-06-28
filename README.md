@@ -48,29 +48,29 @@
      ├── Estructura_ReglasNombrado.pdf
      └── README.md
     
-#### Bilbiografia: 
-Carpeta que contiene bibliografía necesaria para cursar y estudiar los contenidos de la mateira. 
+### Bilbiografia: 
+     Carpeta que contiene bibliografía necesaria para cursar y estudiar los contenidos de la mateira. 
 
-#### Cátedra:
-Carpeta con información de la catedra. En ella se encuentran los links de accesso a las clases vía Zoom, la Modalidad Academica e información sobre los protocolos para rendir examenes parciales y finales. 
+### Cátedra:
+     Carpeta con información de la catedra. En ella se encuentran los links de accesso a las clases vía Zoom, la Modalidad Academica e información sobre los protocolos para rendir examenes parciales y finales. 
 
-#### Guias_TP:
-Carpeta que contiene las guías para realizar los trabajos prácticos evaluables, trabajos practicos resueltos por la Cátedra y los lineamientos para los trabajos practicos conceptuales.
+### Guias_TP:
+     Carpeta que contiene las guías para realizar los trabajos prácticos evaluables, trabajos practicos resueltos por la Cátedra y los lineamientos para los trabajos practicos conceptuales.
 
-#### Presentaciones_Clases_Grabadas: 
-Carpeta que contiene el archivo con las fechas y los links de las clases grabadas (Youtube).
+### Presentaciones_Clases_Grabadas: 
+     Carpeta que contiene el archivo con las fechas y los links de las clases grabadas (Youtube).
 
-#### Templates: 
-Carpeta que contiene los archivos templates para realizar ciertas tareas en exámentes, como por ejemplo el template del Primer Parcial. 
+### Templates: 
+     Carpeta que contiene los archivos templates para realizar ciertas tareas en exámentes, como por ejemplo el template del Primer Parcial. 
 
-#### Tp_Conceptuales: 
-Carpeta que contiene los trabajos practicos conceptuales entregados y corregidos.
+### Tp_Conceptuales: 
+     Carpeta que contiene los trabajos practicos conceptuales entregados y corregidos.
 
-#### Tp_Evaluables: 
-Carpeta que contiene los trabajos practicos evaluables entregados y corregidos. 
+### Tp_Evaluables: 
+     Carpeta que contiene los trabajos practicos evaluables entregados y corregidos. 
 
-#### Unidades: 
-Carpeta que contiene las presentaciones de clases (filminas) según la unidad a la que corresponda. 
+### Unidades: 
+     Carpeta que contiene las presentaciones de clases (filminas) según la unidad a la que corresponda. 
 
-#### Estructura_ReglasNombrado: 
-Archivo pdf que contiene la estructura del repositorio, las reglas de nombrado y la definicion de la linea base.
+### Estructura_ReglasNombrado: 
+     Archivo pdf que contiene la estructura del repositorio, las reglas de nombrado y la definicion de la linea base.
